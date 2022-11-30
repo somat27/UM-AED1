@@ -24,7 +24,7 @@
 		Privada (Apenas visivel para quem segue o criador)
 	User:
 		Pode mudar informações mas nao username
-		COnsultar a lista de amigos
+		Consultar a lista de amigos
 		Criar publicações
 		Ver as publicações dos amigos sendo eleas publicas, reservadas ou privadas
 	Todos os dados teram de ser armazenados em ficheiros
