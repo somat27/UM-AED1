@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <locale.h> 
+#include <string.h>
 
 struct login {
 	char fName[50];
@@ -10,7 +11,7 @@ struct login {
 	int numeroTelemovel[9];
 	char username[50];
 	char password[50];
-};
+} login;
 
 void interface();
 int loginRegister();
@@ -99,16 +100,27 @@ void loginConta(){
 void registerConta(){
 	FILE *log;
 	log = fopen("bd1.ini","w");
-	struct login l;
-	printf("First Name: ");scanf("%s",l.fName);
-	printf("Last Name: ");scanf("%s",l.lName);
-	printf("Email: ");scanf("%s",l.email);
-	printf("Data de Nascimento (DD/MM/AAAA): ");scanf("%s",l.dataNascimento);
-	printf("Numero Telemovel: ");scanf("%s",l.numeroTelemovel);
-	printf("Username: ");scanf("%s",l.username);
-	printf("Password: ");scanf("%s",l.password);
+	//struct login l;
+	printf("First Name: ");scanf("%s",login.fName);
+	printf("Last Name: ");scanf("%s",login.lName);
+	printf("Email: ");scanf("%s",login.email);
+	printf("Data de Nascimento (DD/MM/AAAA): ");scanf("%s",login.dataNascimento);
+	printf("Numero Telemovel: ");scanf("%s",login.numeroTelemovel);
+	printf("Username: ");scanf("%s",login.username);
+	//Colocar a pass invisivel
+	int i = 0;
+	char ch;
+	char pwd[200];
+	printf("Password: ");
+	while((ch = _getch()) != 13){
+		pwd[i] = ch;
+		i++;
+		printf("*");
+	}
+	strcpy(login.password, pwd);
+	puts("");
 	
-	fwrite(&l,sizeof(l),1,log);
+	fwrite(&login,sizeof(login),1,log);
 	fclose(log);
 	printf("Registado com sucesso!\nAgora deve logar com a sua conta nova.");
 	printf("\nPress any key to continue......");
