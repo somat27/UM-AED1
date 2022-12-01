@@ -1,2 +1,2 @@
 # RedeSocialEmC
-Trabalho Pratico AED
+Trabalho Pratico AED1 UMINHO
