@@ -2,6 +2,16 @@
 #include <time.h>
 #include <locale.h> 
 
+struct login {
+	char fName[50];
+	char lName[50];
+	char email[50];
+	char dataNascimento[50];
+	int numeroTelemovel[9];
+	char username[50];
+	char password[50];
+};
+
 void interface();
 int loginRegister();
 void loginConta();
@@ -20,7 +30,7 @@ int main(){
 		return -1;
 	}
 	
-	system("CLS"); // server para limpar a tela
+	//system("CLS"); // server para limpar a tela
 	
 	time_t horario; //time_t é um tipo de varial para horario
 	struct tm * timeinfo; //broken-down calendar time type: year, month, day, hour, minute, second
@@ -60,9 +70,49 @@ int loginRegister(){
 }
 
 void loginConta(){
+	char username[200];
+	FILE *log;
+	log = fopen("bd1.ini","r");
+	struct login l;
+	printf("Username: ");scanf("%s",username);
 	
+	//Colocar a pass invisivel
+	int i = 0;
+	char ch;
+	char pwd[200];
+	printf("Password: ");
+	while((ch = _getch()) != 13){
+		pwd[i] = ch;
+		i++;
+		printf("*");
+	}
+	puts("");
+	while(fread(&l,sizeof(l),1,log)){
+		if(strcmp(username,l.username)==0&&strcmp(pwd,l.password)==0)
+			printf("Succesful Login\n");
+		else
+			printf("Username/Password Incorreto!");
+	}
+	fclose(log);
 }
 
 void registerConta(){
+	FILE *log;
+	log = fopen("bd1.ini","w");
+	struct login l;
+	printf("First Name: ");scanf("%s",l.fName);
+	printf("Last Name: ");scanf("%s",l.lName);
+	printf("Email: ");scanf("%s",l.email);
+	printf("Data de Nascimento (DD/MM/AAAA): ");scanf("%s",l.dataNascimento);
+	printf("Numero Telemovel: ");scanf("%s",l.numeroTelemovel);
+	printf("Username: ");scanf("%s",l.username);
+	printf("Password: ");scanf("%s",l.password);
 	
+	fwrite(&l,sizeof(l),1,log);
+	fclose(log);
+	printf("Registado com sucesso!\nAgora deve logar com a sua conta nova.");
+	printf("\nPress any key to continue......");
+	getch();
+	system("CLS");
+	loginConta();
 }
