@@ -1,137 +1,124 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <locale.h> 
+#include <locale.h>
 #include <string.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-#define TAMANHOSTR 50
+#include <conio.h>
+#define STR_SIZE 50
 #define MAXFRIENDS 50
 
-//Estruturas
-
-struct user {
-	int numeroConta,dia,mes,ano,numeroTelemovel,amigos,tipoConta;
-	char fName[50];
-	char lName[50];
+struct User {
+	int accountId,day,month,year,phoneNumber,friendsCount,accountType;
+	char firstName[50];
+	char lastName[50];
 	char email[50];
 	char username[50];
 	char password[50];
-	char desc[50];
+	char description[50];
 };
 
-struct publicacao {
-	int tipoPub,numeroConta,idPub;
-	char frase[150];
-	char data[20];
-	char fname[50];
-	char lname[50];
+struct Post {
+	int visibility,accountId,postId;
+	char text[150];
+	char dateStr[20];
+	char firstName[50];
+	char lastName[50];
 };
 
-struct amigos {
-	int numeroConta,idSeguido;
-	char fName[50];
-	char lName[50];
-	char fNameS[50];
-	char lNameS[50];
+struct Friendship {
+	int accountId,friendId;
+	char firstName[50];
+	char lastName[50];
+	char sourceFirstName[50];
+	char sourceLastName[50];
 };
 
-//Estruturas
-
-//Funções
-
-void interface();
-int paginaInicial();
-void loginConta();
-void friendster();
-void eliminarConta();
-void paginaPublicacoes();
-void eliminarPub();
-void paginaPerfil();
-int verificarAmigo();
-int contarAmigos();
-void fazerAmigo();
-void menuPub();
-void listaFriends();
-void desfazerFriend();
-void editarPub();
-int contarPub();
-void procurarConta();
-void mostrarPubs();
-void tipoContaUser();
-void criarPub();
-void editarConta();
-void registarConta();
-void registroFirstName();
-void registroLastName();
-void registroEmail();
-void registroNascimento();
-void registroTelemovel();
-void registroUsername();
-void registroPassword();
-int verificarIdConta();
-void mostrarEstatistica();
-int sairPrograma();
-
-//Funções
+void showInterface();
+int mainMenu();
+void loginAccount();
+void friendsterMenu();
+void deleteAccount();
+void postsPage();
+void deletePost();
+void profilePage();
+int isFriend();
+int countFriends();
+void addFriend();
+void postMenu();
+void friendsList();
+void removeFriend();
+void editPost();
+int countPosts();
+void searchAccount();
+void showPosts();
+void getAccountType();
+void createPost();
+void editAccount();
+void registerAccount();
+void inputFirstName();
+void inputLastName();
+void inputEmail();
+void inputBirthDate();
+void inputPhone();
+void inputUsername();
+void inputPassword();
+int nextAccountId();
+void showStatistics();
+int exitProgram();
 
 int main(){
-	setlocale(LC_ALL, "Portuguese"); //Mudar lingua para portugues devido aos acentos
+	setlocale(LC_ALL, "C");
 	system("CLS");
-	interface();
-	int op = paginaInicial();
-	if(op){
-		if(op==1)
-			loginConta();
-		else if(op==2)
-			registarConta();
-		else if(op==3)
-			paginaPublicacoes(0,0);
-		else if(op==4)
-			mostrarEstatistica();
-		else if(op==5)
-			sairPrograma();
+	showInterface();
+	int option = mainMenu();
+	if(option){
+		if(option==1)
+			loginAccount();
+		else if(option==2)
+			registerAccount();
+		else if(option==3)
+			postsPage(0,0);
+		else if(option==4)
+			showStatistics();
+		else if(option==5)
+			exitProgram();
 	}else{
 		return 0;
 	}
-	
+
 	return 0;
 }
 
-//Interface
-
-void interface(){
+void showInterface(){
 	printf("\n");
-	printf("\n ¦¦¦¦¦¦¦ ¦¦¦¦¦¦  ¦¦ ¦¦¦¦¦¦¦ ¦¦¦    ¦¦ ¦¦¦¦¦¦  ¦¦¦¦¦¦¦ ¦¦¦¦¦¦¦¦ ¦¦¦¦¦¦¦ ¦¦¦¦¦¦ ");
-	printf("\n ¦¦      ¦¦   ¦¦ ¦¦ ¦¦      ¦¦¦¦   ¦¦ ¦¦   ¦¦ ¦¦         ¦¦    ¦¦      ¦¦   ¦¦");
-	printf("\n ¦¦¦¦¦   ¦¦¦¦¦¦  ¦¦ ¦¦¦¦¦   ¦¦ ¦¦  ¦¦ ¦¦   ¦¦ ¦¦¦¦¦¦¦    ¦¦    ¦¦¦¦¦   ¦¦¦¦¦¦ ");
-	printf("\n ¦¦      ¦¦   ¦¦ ¦¦ ¦¦      ¦¦  ¦¦ ¦¦ ¦¦   ¦¦      ¦¦    ¦¦    ¦¦      ¦¦   ¦¦");
-	printf("\n ¦¦      ¦¦¦  ¦¦ ¦¦ ¦¦¦¦¦¦¦ ¦¦   ¦¦¦¦ ¦¦¦¦¦¦  ¦¦¦¦¦¦¦    ¦¦    ¦¦¦¦¦¦¦ ¦¦   ¦¦");
+	printf("\n ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½    ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ");
+	printf("\n ï¿½ï¿½      ï¿½ï¿½   ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½      ï¿½ï¿½ï¿½ï¿½   ï¿½ï¿½ ï¿½ï¿½   ï¿½ï¿½ ï¿½ï¿½         ï¿½ï¿½    ï¿½ï¿½      ï¿½ï¿½   ï¿½ï¿½");
+	printf("\n ï¿½ï¿½ï¿½ï¿½ï¿½   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½   ï¿½ï¿½ ï¿½ï¿½  ï¿½ï¿½ ï¿½ï¿½   ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½    ï¿½ï¿½    ï¿½ï¿½ï¿½ï¿½ï¿½   ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ");
+	printf("\n ï¿½ï¿½      ï¿½ï¿½   ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½      ï¿½ï¿½  ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½   ï¿½ï¿½      ï¿½ï¿½    ï¿½ï¿½    ï¿½ï¿½      ï¿½ï¿½   ï¿½ï¿½");
+	printf("\n ï¿½ï¿½      ï¿½ï¿½ï¿½  ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½   ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½  ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½    ï¿½ï¿½    ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½   ï¿½ï¿½");
 	printf("\n");
 }
 
-//Interface
-
-//Pagina Inicial
-
-int paginaInicial(){
-	int op;
-	printf("\n Bem vindo ao Friendster, a melhor rede social feita inteiramente em C. \n");
-	printf("\n 1) Acessar Conta  2) Criar Conta  3) Modo Anônimo*  4) Estatistica  5) Sair");
-	printf("\n *Apenas poderá ver conteúdo marcado como público.");
-	printf("\n Opção: ");
-	scanf("%d",&op);
-	switch(op){
+int mainMenu(){
+	int option;
+	printf("\n Welcome to Friendster, a console social network written in C. \n");
+	printf("\n 1) log in  2) Create Account  3) Anonymous Mode*  4) Statistics  5) Exit");
+	printf("\n *You can only view content marked as public.");
+	printf("\n Option: ");
+	scanf("%d",&option);
+	switch(option){
 		case 1:
 		case 2:
 		case 3:
 		case 4:
 		case 5:
-			return op;
+			return option;
 			break;
 		default:
-			printf("\n Opção invalida");
+			printf("\n Invalid option");
 			printf("\n Press any key to continue......");
 			getch();
 			system("CLS");
@@ -140,45 +127,41 @@ int paginaInicial(){
 	}
 }
 
-//Pagina Inicial
-
-//Login Conta
-
-void loginConta(){
+void loginAccount(){
 	system("CLS");
-	FILE *log;
-	log = fopen("bd1","rb");
-	if (log == NULL){
+	FILE *usersFileR;
+	usersFileR = fopen("users","rb");
+	if (usersFileR == NULL){
 		printf("1 ERROR: File not open");
-		fclose(log);
-		log = fopen("bd1","ab");
-		fclose(log);
+		fclose(usersFileR);
+		usersFileR = fopen("users","ab");
+		fclose(usersFileR);
 		printf("\nTry Again ....");
 		getch();
-		loginConta();
+		loginAccount();
 	}
 	FILE *lastlog;
 	lastlog = fopen("lastlog","wb");
-	struct user user;
-	char username[200] = {}; //Password esta com {} para corrigir o erro de quando se erra a pass ele guardar enters e bugar a pass seguinte
-	int i=0,numConta;
-	interface();
-	printf("\n Sistema de LOGIN\n");
+	struct User user;
+	char username[200] = {};
+	int i=0,accountIdVar;
+	showInterface();
+	printf("\n LOGIN System\n");
 	printf(" Username: ");scanf("%s",username);
 	printf(" Password: ");
 	char ch,password[200] = {};
 	int cPos = 0;
 	while(1){
 		ch = getch();
-		if(ch==13){ // Enter
+		if(ch==13){
 			break;
-		}else if(ch==8){ // BackSpace
+		}else if(ch==8){
 			if(cPos>0){
 				cPos--;
 				password[cPos] = '\0';
 				printf("\b \b");
 			}
-		}else if(ch==32||ch==9){ //Espaço ou Tab
+		}else if(ch==32||ch==9){
 			continue;
 		}else{
 			password[cPos] = ch;
@@ -187,115 +170,111 @@ void loginConta(){
 		}
 	}
 	int fuser=0,fpass=0;
-	while(fread(&user,sizeof(user),1,log)){
+	while(fread(&user,sizeof(user),1,usersFileR)){
 		if(strcmp(username,user.username) == 0){
 			fuser = 1;
 			if(strcmp(password, user.password) == 0){
 				fpass = 1;
-				numConta = user.numeroConta;
+				accountIdVar = user.accountId;
 				fwrite(&user,sizeof(user),1,lastlog);
 				break;
 			}
 		}
 	}
-	fclose(log);
+	fclose(usersFileR);
 	fclose(lastlog);
 	if(fuser == 0){
 		printf("\n");
-		printf("\n Username invalido!");
-		printf("\n Tenta novamente...");
+		printf("\n Invalid username!");
+		printf("\n Try again...");
 		getch();
-		loginConta();
+		loginAccount();
 	}else if(fpass == 0){
 		printf("\n");
-		printf("\n Password para o username: %s é invalida!",username);	
-		printf("\n Tenta novamente...");
+		printf("\n Password for username %s is invalid!",username);
+		printf("\n Try again...");
 		getch();
-		loginConta();
+		loginAccount();
 	}else{
-		friendster(numConta);
+		friendsterMenu(accountIdVar);
 	}
 }
 
-//Login Conta
-
-//Friendster
-
-void friendster(int idAutor){
-	int op;
+void friendsterMenu(int authorId){
+	int option;
 	system("CLS");
-	interface();
-	printf("\n 1) Pagina Inicial 2) Perfil 3) Eliminar Conta 4) Terminar Sessão 5) Sair");
-	printf("\n Opção: ");
-	scanf("%d",&op);
-	switch(op){
+	showInterface();
+	printf("\n 1) Home 2) Profile 3) Delete Account 4) usersFileR Out 5) Exit");
+	printf("\n Option: ");
+	scanf("%d",&option);
+	switch(option){
 		case 1:
-			paginaPublicacoes(1,idAutor);
+			postsPage(1,authorId);
 			break;
 		case 2:
-			paginaPerfil(idAutor,0,0);
+			profilePage(authorId,0,0);
 			break;
 		case 3:
-			eliminarConta(idAutor);
+			deleteAccount(authorId);
 			break;
 		case 4:
 			main();
 			break;
 		case 5:
-			sairPrograma();
+			exitProgram();
 			break;
 		default:
-			printf("\n Opção invalida");
+			printf("\n Invalid option");
 			printf("\n Press any key to continue......");
 			getch();
 			system("CLS");
-			friendster(idAutor);
+			friendsterMenu(authorId);
 			break;
 	}
 }
 
-void eliminarConta(int idAutor){
-	char op[25];
+void deleteAccount(int authorId){
+	char option[25];
 	system("CLS");
-	printf("\n =======AVISO=======");
-    printf("\n Esta ação é irreversível.\n\n");
-	printf("\n Deseja Continuar? (sim ou nao)\n ");
-	scanf("%s",op);
-	if(!strcmp(op,"nao")||!strcmp(op,"Nao")){
-		friendster(idAutor);
+	printf("\n =======WARNING=======");
+    printf("\n This action is irreversible.\n\n");
+	printf("\n Do you want to continue? (yes or no)\n ");
+	scanf("%s",option);
+	if(!strcmp(option,"nao")||!strcmp(option,"Nao")||!strcmp(option,"no")||!strcmp(option,"No")){
+		friendsterMenu(authorId);
 	}
-	
-    FILE *log;
-    log = fopen("bd1","rb");
-    if(log == NULL){
+
+    FILE *usersFileR;
+    usersFileR = fopen("users","rb");
+    if(usersFileR == NULL){
     	printf("1 ERROR: File not open");
-    	fclose(log);
-    	log = fopen("bd1","ab");
-    	fclose(log);
+    	fclose(usersFileR);
+    	usersFileR = fopen("users","ab");
+    	fclose(usersFileR);
 		getch();
-		eliminarConta(idAutor);
+		deleteAccount(authorId);
 	}
-	FILE *auxfile;
-	auxfile = fopen("auxfile","wb");
-	
-	struct user user;
-	int aux, i=0, apagar = 0;
+	FILE *tmpFile;
+	tmpFile = fopen("tmpFile","wb");
+
+	struct User user;
+	int tmp, i=0, apagar = 0;
 	char ch,password[200] = {};
 	int cPos = 0;
-	while(fread(&user,sizeof(user),1,log)){
-		if(user.numeroConta==idAutor){
-			printf("\n Para verificar a autenticidade da conta, introduza a palavra passe! \n Pass: ");
+	while(fread(&user,sizeof(user),1,usersFileR)){
+		if(user.accountId==authorId){
+			printf("\n To verify account ownership, please enter your password! \n Pass: ");
 			while(1){
 				ch = getch();
-				if(ch==13){ // Enter
+				if(ch==13){
 					break;
-				}else if(ch==8){ // BackSpace
+				}else if(ch==8){
 					if(cPos>0){
 						cPos--;
 						password[cPos] = '\0';
 						printf("\b \b");
 					}
-				}else if(ch==32||ch==9){ //Espaço ou Tab
+				}else if(ch==32||ch==9){
 					continue;
 				}else{
 					password[cPos] = ch;
@@ -307,347 +286,345 @@ void eliminarConta(int idAutor){
 				apagar = 1;
 			}else{
 				system("CLS");
-				printf("\n Password Incorreta, por favor tente novamente mais tarde!");
-				printf("\n Pressiona qualquer tecla para continuar...");
+				printf("\n Incorrect password, please try again later!");
+				printf("\n Press any key to continue......");
 				getch();
-				remove("auxfile");
-				friendster(idAutor);
+				remove("tmpFile");
+				friendsterMenu(authorId);
 			}
 		}else{
-			fwrite(&user,sizeof(user),1, auxfile);
+			fwrite(&user,sizeof(user),1, tmpFile);
 		}
 	}
-	fclose(log);
-	fclose(auxfile);
-	printf("\n\n Conta eliminada com sucesso.\n");
-	printf("\n Pressiona qualquer tecla para continuar...");
+	fclose(usersFileR);
+	fclose(tmpFile);
+	printf("\n\n Account deleted successfully.\n");
+	printf("\n Press any key to continue......");
 	getch();
 	if(apagar == 1){
-		remove("bd1");
-		rename("auxfile","bd1");
+		remove("users");
+		rename("tmpFile","users");
 	}
 	main();
 }
 
-void paginaPublicacoes(int tipoUser, int idAutor){
-	int op;
+void postsPage(int userType, int authorId){
+	int option;
 	system("CLS");
-	interface();
-	printf("\n Lista de Publicações: \n");
-	if(tipoUser == 0){
-		mostrarPubs(1,0,0,0);
-		printf("\n 1) Procurar Conta 2) Voltar");
-		printf("\n Opção: ");
-		scanf("%d", &op);
-		switch(op){
+	showInterface();
+	printf("\n Posts Feed: \n");
+	if(userType == 0){
+		showPosts(1,0,0,0);
+		printf("\n 1) Search Account 2) Back");
+		printf("\n Option: ");
+		scanf("%d", &option);
+		switch(option){
 			case 1:
-				procurarConta(idAutor,tipoUser);
+				searchAccount(authorId,userType);
 				break;
 			case 2:
 				main();
 				break;
 			default:
-				printf("\n Opção invalida");
+				printf("\n Invalid option");
 				printf("\n Press any key to continue......");
 				getch();
 				system("CLS");
-				paginaPublicacoes(tipoUser, idAutor);
+				postsPage(userType, authorId);
 				break;
 		}
-	}if(tipoUser == 1){
-		FILE *log;
-		log = fopen("bd1","rb");
-		printf("%s",log);
-		if (log == NULL){
+	}if(userType == 1){
+		FILE *usersFileR;
+		usersFileR = fopen("users","rb");
+		printf("%s",usersFileR);
+		if (usersFileR == NULL){
 			printf("3 ERROR: File not open");
-			fclose(log);
-			log = fopen("bd1","ab");
-			fclose(log);
+			fclose(usersFileR);
+			usersFileR = fopen("users","ab");
+			fclose(usersFileR);
 			printf("\nTry Again ....");
 			getch();
-			paginaPublicacoes(tipoUser, idAutor);
+			postsPage(userType, authorId);
 		}
-		struct user user;
-		while(fread(&user,sizeof(user),1,log)){
-			if(user.numeroConta == idAutor){
-				mostrarPubs(1,1,0,0);
-				printf("\n 1) Procurar Conta 2) Criar Publicação 3) Voltar");
-				printf("\n Opção: ");
-				scanf("%d", &op);
-				fclose(log);
-				switch(op){
+		struct User user;
+		while(fread(&user,sizeof(user),1,usersFileR)){
+			if(user.accountId == authorId){
+				showPosts(1,1,0,0);
+				printf("\n 1) Search Account 2) Create Post 3) Back");
+				printf("\n Option: ");
+				scanf("%d", &option);
+				fclose(usersFileR);
+				switch(option){
 					case 1:
-						procurarConta(idAutor,tipoUser);
+						searchAccount(authorId,userType);
 						break;
 					case 2:
-						criarPub(user.fName, user.lName, idAutor);
+						createPost(user.firstName, user.lastName, authorId);
 						break;
 					case 3:
-						friendster(idAutor);
+						friendsterMenu(authorId);
 						break;
 					default:
-						printf("\n Opção invalida");
+						printf("\n Invalid option");
 						printf("\n Press any key to continue......");
 						getch();
 						system("CLS");
-						paginaPublicacoes(tipoUser, idAutor);
+						postsPage(userType, authorId);
 						break;
 				}
 				break;
 			}
 		}
-		//Modo User
-		
-		//Ver as publicações com o tipo: 1/2 (Publica/Restrita) e a 3 (Privada) mas apenas das pessoas que segue
+
 	}
 }
 
-void procurarConta(int idAutor, int tipoVoltar){
+void searchAccount(int authorId, int backType){
 	system("CLS");
-	interface();
-	char nome[50];
-	printf("\n Nome da conta que deseja procurar: ");
-	scanf("%s",nome);
-	
-	FILE *log;
-	log = fopen("bd1","rb");
-	printf("%s",log);
-	if (log == NULL){
+	showInterface();
+	char name[50];
+	printf("\n Account first name to search: ");
+	scanf("%s",name);
+
+	FILE *usersFileR;
+	usersFileR = fopen("users","rb");
+	printf("%s",usersFileR);
+	if (usersFileR == NULL){
 		printf("3 ERROR: File not open");
-		fclose(log);
-		log = fopen("bd1","ab");
-		fclose(log);
+		fclose(usersFileR);
+		usersFileR = fopen("users","ab");
+		fclose(usersFileR);
 		printf("\nTry Again ....");
 		getch();
-		procurarConta(idAutor,tipoVoltar);
+		searchAccount(authorId,backType);
 	}
-	
-	struct user user;
-	int i=1,op,continuar=0;
-	char op2[5];
-	while(fread(&user,sizeof(user),1,log)){
-		if(strcmp(nome,user.fName)==0){
-			printf("\n %s %s [@%s] é a conta que procura? (sim ou nao)",user.fName,user.lName,user.username);
-			printf("\n Opção: ");
-			scanf("%s",op2);
-			if(!strcmp(op2,"sim")||!strcmp(op2,"Sim")){
-				continuar = 1;
-				fclose(log);
-				paginaPerfil(idAutor, 1, user.numeroConta);
+
+	struct User user;
+	int i=1,option,proceed=0;
+	char option2[5];
+	while(fread(&user,sizeof(user),1,usersFileR)){
+		if(strcmp(name,user.firstName)==0){
+			printf("\n %s %s [@%s] â€” is this the account you are looking for? (yes or no)",user.firstName,user.lastName,user.username);
+			printf("\n Option: ");
+			scanf("%s",option2);
+			if(!strcmp(option2,"sim")||!strcmp(option2,"Sim")||!strcmp(option2,"yes")||!strcmp(option2,"Yes")){
+				proceed = 1;
+				fclose(usersFileR);
+				profilePage(authorId, 1, user.accountId);
 				break;
 			}
 		}
 	}
-	if(continuar == 0){
-		printf("\n 1) Procurar Novamente 2) Voltar");
-		printf("\n Opção: ");
-		scanf("%d",&op);
-		switch(op){
+	if(proceed == 0){
+		printf("\n 1) Search Again 2) Back");
+		printf("\n Option: ");
+		scanf("%d",&option);
+		switch(option){
 			case 1:
-				procurarConta(idAutor,tipoVoltar);
+				searchAccount(authorId,backType);
 				break;
 			case 2:
-				paginaPublicacoes(tipoVoltar, idAutor);
+				postsPage(backType, authorId);
 				break;
 			default:
-				printf("\n Opção invalida");
+				printf("\n Invalid option");
 				printf("\n Press any key to continue......");
 				getch();
-				procurarConta(idAutor,tipoVoltar);
+				searchAccount(authorId,backType);
 				break;
 		}
 	}
 }
 
-void mostrarPubs(int op1,int op2,int op3,int idAutor){ //Publica, Reservada, Privada, Id Conta
-	FILE *pubs;
-	pubs = fopen("pubs","rb");
-	if (pubs == NULL){
+void showPosts(int op1,int option2,int op3,int authorId){
+	FILE *postsFile;
+	postsFile = fopen("posts","rb");
+	if (postsFile == NULL){
 		printf("2 ERROR: File not open");
-		fclose(pubs);
-		pubs = fopen("pubs","ab");
-		fclose(pubs);
+		fclose(postsFile);
+		postsFile = fopen("posts","ab");
+		fclose(postsFile);
 		printf("\nTry Again ....");
 		getch();
-		mostrarPubs(op1,op2,op3,idAutor);
+		showPosts(op1,option2,op3,authorId);
 	}
-	
-	struct publicacao publicacao;
-	while(fread(&publicacao,sizeof(publicacao),1,pubs)){
-		if(idAutor != 0){
-			if(publicacao.numeroConta == idAutor){
-				if(publicacao.tipoPub == 1 && op1){
-					printf("\n %s %s -- %s [Publica]\n ID %d -> %s\n",publicacao.fname,publicacao.lname,publicacao.data,publicacao.idPub,publicacao.frase);	
+
+	struct Post post;
+	while(fread(&post,sizeof(post),1,postsFile)){
+		if(authorId != 0){
+			if(post.accountId == authorId){
+				if(post.visibility == 1 && op1){
+					printf("\n %s %s -- %s [Public]\n ID %d -> %s\n",post.firstName,post.lastName,post.dateStr,post.postId,post.text);
 				}
-				if(publicacao.tipoPub == 2 && op2){
-					printf("\n %s %s -- %s [Reservada]\n ID %d -> %s\n",publicacao.fname,publicacao.lname,publicacao.data,publicacao.idPub,publicacao.frase);					
+				if(post.visibility == 2 && option2){
+					printf("\n %s %s -- %s [Restricted]\n ID %d -> %s\n",post.firstName,post.lastName,post.dateStr,post.postId,post.text);
 				}
-				if(publicacao.tipoPub == 3 && op3){
-					printf("\n %s %s -- %s [Privada]\n ID %d -> %s\n",publicacao.fname,publicacao.lname,publicacao.data,publicacao.idPub,publicacao.frase);				
+				if(post.visibility == 3 && op3){
+					printf("\n %s %s -- %s [Private]\n ID %d -> %s\n",post.firstName,post.lastName,post.dateStr,post.postId,post.text);
 				}
-			}	
+			}
 		}else{
-			if(publicacao.tipoPub == 1 && op1){
-				printf("\n %s %s -- %s [Publica]\n ID %d -> %s\n",publicacao.fname,publicacao.lname,publicacao.data,publicacao.idPub,publicacao.frase);	
+			if(post.visibility == 1 && op1){
+				printf("\n %s %s -- %s [Public]\n ID %d -> %s\n",post.firstName,post.lastName,post.dateStr,post.postId,post.text);
 			}
-			if(publicacao.tipoPub == 2 && op2){
-				printf("\n %s %s -- %s [Reservada]\n ID %d -> %s\n",publicacao.fname,publicacao.lname,publicacao.data,publicacao.idPub,publicacao.frase);					
+			if(post.visibility == 2 && option2){
+				printf("\n %s %s -- %s [Restricted]\n ID %d -> %s\n",post.firstName,post.lastName,post.dateStr,post.postId,post.text);
 			}
-			if(publicacao.tipoPub == 3 && op3){
-				printf("\n %s %s -- %s [Privada]\n ID %d -> %s\n",publicacao.fname,publicacao.lname,publicacao.data,publicacao.idPub,publicacao.frase);				
+			if(post.visibility == 3 && op3){
+				printf("\n %s %s -- %s [Private]\n ID %d -> %s\n",post.firstName,post.lastName,post.dateStr,post.postId,post.text);
 			}
 		}
 	}
-	fclose(pubs);
+	fclose(postsFile);
 }
 
-void paginaPerfil(int idAutor, int verCriador, int idConta){
+void profilePage(int authorId, int viewOwner, int targetAccountId){
 	system("CLS");
-	if(verCriador == 0){
-		FILE *log;
-		log = fopen("bd1","rb");
-		printf("%s",log);
-		if (log == NULL){
+	if(viewOwner == 0){
+		FILE *usersFileR;
+		usersFileR = fopen("users","rb");
+		printf("%s",usersFileR);
+		if (usersFileR == NULL){
 			printf("3 ERROR: File not open");
-			fclose(log);
-			log = fopen("bd1","ab");
-			fclose(log);
+			fclose(usersFileR);
+			usersFileR = fopen("users","ab");
+			fclose(usersFileR);
 			printf("\nTry Again ....");
 			getch();
-			paginaPerfil(idAutor,verCriador, 0);
+			profilePage(authorId,viewOwner, 0);
 		}
-		int op;
-		struct user user;
-		while(fread(&user,sizeof(user),1,log)){
-			if(idAutor == user.numeroConta){
-				int pubs = contarPub(user.numeroConta,0);
-				int amigos = contarAmigos(user.numeroConta);
-				char tipoConta[50];
-				tipoContaUser(user.numeroConta, tipoConta);
-				printf("\n %s %s [@%s]\t Conta %d: %s\n",user.fName, user.lName,user.username,user.numeroConta,tipoConta); 
-				printf("\n Publicações: %d \t Amigos: %d\n",pubs,amigos);
-				printf("\n Descrição: %s", user.desc);
-				printf("\n\n\n Publicações: \n");
-				mostrarPubs(1,1,1,idAutor);
-				printf("\n 1) Menu Publicação 2) Editar Conta 3) Lista de Amigos 4) Voltar");
-				printf("\n Opção: ");
-				scanf("%d", &op);
-				fclose(log);
-				switch(op){
+		int option;
+		struct User user;
+		while(fread(&user,sizeof(user),1,usersFileR)){
+			if(authorId == user.accountId){
+				int postsFile = countPosts(user.accountId,0);
+				int friendsCount = countFriends(user.accountId);
+				char accountType[50];
+				getAccountType(user.accountId, accountType);
+				printf("\n %s %s [@%s]\\t Account %d: %s\n",user.firstName, user.lastName,user.username,user.accountId,accountType);
+				printf("\n Posts: %d \t Friends: %d\n",postsFile,friendsCount);
+				printf("\n Description: %s", user.description);
+				printf("\n\n\n Posts: \n");
+				showPosts(1,1,1,authorId);
+				printf("\n 1) Post Menu 2) Edit Account 3) Friends List 4) Back");
+				printf("\n Option: ");
+				scanf("%d", &option);
+				fclose(usersFileR);
+				switch(option){
 					case 1:
-						menuPub(user.fName, user.lName, idAutor);
+						postMenu(user.firstName, user.lastName, authorId);
 						break;
 					case 2:
-						editarConta(idAutor);
+						editAccount(authorId);
 						break;
 					case 3:
-						listaFriends(idAutor);
+						friendsList(authorId);
 						break;
 					case 4:
-						friendster(idAutor);
+						friendsterMenu(authorId);
 						break;
 					default:
-						printf("\n Opção invalida");
+						printf("\n Invalid option");
 						printf("\n Press any key to continue......");
 						getch();
 						system("CLS");
-						paginaPerfil(idAutor,verCriador,0);
+						profilePage(authorId,viewOwner,0);
 						break;
 				}
 			}
 		}
-	}else if(verCriador == 1){
-		FILE *log;
-		log = fopen("bd1","rb");
-		printf("%s",log);
-		if (log == NULL){
+	}else if(viewOwner == 1){
+		FILE *usersFileR;
+		usersFileR = fopen("users","rb");
+		printf("%s",usersFileR);
+		if (usersFileR == NULL){
 			printf("3 ERROR: File not open");
-			fclose(log);
-			log = fopen("bd1","ab");
-			fclose(log);
+			fclose(usersFileR);
+			usersFileR = fopen("users","ab");
+			fclose(usersFileR);
 			printf("\nTry Again ....");
 			getch();
-			paginaPerfil(idAutor,verCriador,0);
+			profilePage(authorId,viewOwner,0);
 		}
-		int op;
-		struct user user;
-		while(fread(&user,sizeof(user),1,log)){
-			if(idConta == user.numeroConta){
-				int pubs = contarPub(user.numeroConta,0);
-				int amigos = contarAmigos(user.numeroConta);
-				int eAmigo = verificarAmigo(idAutor,user.numeroConta);
-				char tipoConta[50];
-				tipoContaUser(user.numeroConta, tipoConta);
-				if(eAmigo == 1){
-					printf("\n %s %s [@%s]\t Conta %d: %s\n",user.fName, user.lName,user.username,user.numeroConta,tipoConta); 
-					printf("\n Publicações: %d \t Amigos: %d\n",pubs,amigos);
-					printf("\n Descrição: %s", user.desc);
-					printf("\n\n SÃO AMIGOS!\n\n Publicações: \n");
+		int option;
+		struct User user;
+		while(fread(&user,sizeof(user),1,usersFileR)){
+			if(targetAccountId == user.accountId){
+				int postsFile = countPosts(user.accountId,0);
+				int friendsCount = countFriends(user.accountId);
+				int areFriends = isFriend(authorId,user.accountId);
+				char accountType[50];
+				getAccountType(user.accountId, accountType);
+				if(areFriends == 1){
+					printf("\n %s %s [@%s]\\t Account %d: %s\n",user.firstName, user.lastName,user.username,user.accountId,accountType);
+					printf("\n Posts: %d \t Friends: %d\n",postsFile,friendsCount);
+					printf("\n Description: %s", user.description);
+					printf("\n\n YOU ARE FRIENDS!\n\n Posts: \n");
 				}else{
-					printf("\n %s %s [@%s]\t Conta %d: %s\n",user.fName, user.lName,user.username,user.numeroConta,tipoConta); 
-					printf("\n Publicações: %d \t Amigos: %d\n",pubs,amigos);
-					printf("\n Descrição: %s", user.desc);
-					printf("\n\n\n Publicações: \n");
+					printf("\n %s %s [@%s]\\t Account %d: %s\n",user.firstName, user.lastName,user.username,user.accountId,accountType);
+					printf("\n Posts: %d \t Friends: %d\n",postsFile,friendsCount);
+					printf("\n Description: %s", user.description);
+					printf("\n\n\n Posts: \n");
 				}
-				if(idAutor == 0){
-					mostrarPubs(1,0,0,user.numeroConta);
-					printf("\n 1) Voltar");
-					printf("\n Opção: ");
-					scanf("%d", &op);
-					fclose(log);
-					switch(op){
+				if(authorId == 0){
+					showPosts(1,0,0,user.accountId);
+					printf("\n 1) Back");
+					printf("\n Option: ");
+					scanf("%d", &option);
+					fclose(usersFileR);
+					switch(option){
 						case 1:
-							paginaPublicacoes(0,0);
+							postsPage(0,0);
 							break;
 						default:
-							printf("\n Opção invalida");
+							printf("\n Invalid option");
 							printf("\n Press any key to continue......");
 							getch();
 							system("CLS");
-							paginaPerfil(idAutor,verCriador,idConta);
+							profilePage(authorId,viewOwner,targetAccountId);
 							break;
 					}
-				}else{	
-					if(eAmigo == 1){
-						mostrarPubs(1,1,1,user.numeroConta);
+				}else{
+					if(areFriends == 1){
+						showPosts(1,1,1,user.accountId);
 					}else{
-						mostrarPubs(1,1,0,user.numeroConta);
+						showPosts(1,1,0,user.accountId);
 					}
-					if(strcmp(tipoConta,"Privada")==0||eAmigo==1||idAutor==user.numeroConta){//Privada
-						printf("\n 1) Voltar");
-						printf("\n Opção: ");
-						scanf("%d", &op);
-						fclose(log);
-						switch(op){
+					if(strcmp(accountType,"Private")==0||areFriends==1||authorId==user.accountId){
+						printf("\n 1) Back");
+						printf("\n Option: ");
+						scanf("%d", &option);
+						fclose(usersFileR);
+						switch(option){
 							case 1:
-								friendster(idAutor);
+								friendsterMenu(authorId);
 								break;
 							default:
-								printf("\n Opção invalida");
+								printf("\n Invalid option");
 								printf("\n Press any key to continue......");
 								getch();
 								system("CLS");
-								paginaPerfil(idAutor,verCriador,idConta);
+								profilePage(authorId,viewOwner,targetAccountId);
 								break;
 						}
-					}else{//Publica
-						printf("\n 1) Fazer Amizade 2) Voltar");
-						printf("\n Opção: ");
-						scanf("%d", &op);
-						fclose(log);
-						switch(op){
+					}else{
+						printf("\n 1) Add Friend 2) Back");
+						printf("\n Option: ");
+						scanf("%d", &option);
+						fclose(usersFileR);
+						switch(option){
 							case 1:
-								fazerAmigo(idAutor,idConta);
+								addFriend(authorId,targetAccountId);
 								break;
 							case 2:
-								friendster(idAutor);
+								friendsterMenu(authorId);
 								break;
 							default:
-								printf("\n Opção invalida");
+								printf("\n Invalid option");
 								printf("\n Press any key to continue......");
 								getch();
 								system("CLS");
-								paginaPerfil(idAutor,verCriador,idConta);
+								profilePage(authorId,viewOwner,targetAccountId);
 								break;
 						}
 					}
@@ -657,531 +634,531 @@ void paginaPerfil(int idAutor, int verCriador, int idConta){
 	}
 }
 
-int verificarAmigo(int idAutor, int numeroConta){
-	FILE *amgs;
-	amgs = fopen("ListaAmigos","rb");
-	if(amgs == NULL){
-		fclose(amgs);
-		amgs = fopen("ListaAmigos","ab");
-		fclose(amgs);
-		listaFriends(idAutor);
+int isFriend(int authorId, int accountId){
+	FILE *friendsFile;
+	friendsFile = fopen("friendships","rb");
+	if(friendsFile == NULL){
+		fclose(friendsFile);
+		friendsFile = fopen("friendships","ab");
+		fclose(friendsFile);
+		friendsList(authorId);
 	}
-	struct amigos amigos;
-	while(fread(&amigos,sizeof(amigos),1,amgs)){
-		if(amigos.numeroConta==idAutor && amigos.idSeguido==numeroConta||amigos.numeroConta==numeroConta && amigos.idSeguido==idAutor){
+	struct Friendship friendship;
+	while(fread(&friendsCount,sizeof(friendship),1,friendsFile)){
+		if(friendsCount.accountId==authorId && friendsCount.friendId==accountId||friendsCount.accountId==accountId && friendsCount.friendId==authorId){
 			return 1;
 		}
 	}
-	fclose(amgs);
+	fclose(friendsFile);
 	return 0;
 }
 
-int contarAmigos(int idAutor){
-	int totalAmigos=0;
-	FILE *amgs;
-	amgs = fopen("ListaAmigos","rb");
-	if(amgs == NULL){
-		fclose(amgs);
-		amgs = fopen("ListaAmigos","ab");
-		fclose(amgs);
-		listaFriends(idAutor);
+int countFriends(int authorId){
+	int totalFriends=0;
+	FILE *friendsFile;
+	friendsFile = fopen("friendships","rb");
+	if(friendsFile == NULL){
+		fclose(friendsFile);
+		friendsFile = fopen("friendships","ab");
+		fclose(friendsFile);
+		friendsList(authorId);
 	}
-	struct amigos amigos;
-	while(fread(&amigos,sizeof(amigos),1,amgs)){
-		if(amigos.numeroConta==idAutor||amigos.idSeguido==idAutor){
-			totalAmigos++;
+	struct Friendship friendship;
+	while(fread(&friendsCount,sizeof(friendship),1,friendsFile)){
+		if(friendsCount.accountId==authorId||friendsCount.friendId==authorId){
+			totalFriends++;
 		}
 	}
-	fclose(amgs);
-	return totalAmigos;
+	fclose(friendsFile);
+	return totalFriends;
 }
 
-void fazerAmigo(int idAutor, int idConta){
+void addFriend(int authorId, int targetAccountId){
 	system("CLS");
-	interface();
-	int totalAmigos = contarAmigos(idAutor);
-	if(totalAmigos<=50){
-		struct amigos amigos;
-		FILE *amgs;
-		amgs = fopen("ListaAmigos","ab");
-		FILE *log;
-		log = fopen("bd1","rb");
-		struct user user;
-		while(fread(&user,sizeof(user),1,log)){
-			if(user.numeroConta == idConta){
-				strcpy(amigos.fName,user.fName);
-				strcpy(amigos.lName,user.lName);
+	showInterface();
+	int totalFriends = countFriends(authorId);
+	if(totalFriends<=50){
+		struct Friendship friendship;
+		FILE *friendsFile;
+		friendsFile = fopen("friendships","ab");
+		FILE *usersFileR;
+		usersFileR = fopen("users","rb");
+		struct User user;
+		while(fread(&user,sizeof(user),1,usersFileR)){
+			if(user.accountId == targetAccountId){
+				strcpy(friendsCount.firstName,user.firstName);
+				strcpy(friendsCount.lastName,user.lastName);
 			}
-			if(user.numeroConta == idAutor){
-				strcpy(amigos.fNameS,user.fName);
-				strcpy(amigos.lNameS,user.lName);
+			if(user.accountId == authorId){
+				strcpy(friendsCount.sourceFirstName,user.firstName);
+				strcpy(friendsCount.sourceLastName,user.lastName);
 			}
 		}
-		amigos.numeroConta = idAutor;
-		amigos.idSeguido = idConta;
-		fwrite(&amigos,sizeof(amigos),1,amgs);
-		fclose(amgs);
-		fclose(log);
-		printf("\n %s %s, fizeste amizado com %s %s!",amigos.fNameS,amigos.lNameS,amigos.fName,amigos.lName);
+		friendsCount.accountId = authorId;
+		friendsCount.friendId = targetAccountId;
+		fwrite(&friendsCount,sizeof(friendship),1,friendsFile);
+		fclose(friendsFile);
+		fclose(usersFileR);
+		printf("\n %s %s, you are now friends with %s %s!",friendsCount.sourceFirstName,friendsCount.sourceLastName,friendsCount.firstName,friendsCount.lastName);
 		getch();
-		paginaPerfil(idAutor,1,idConta);
+		profilePage(authorId,1,targetAccountId);
 	}else{
-		printf("\n Nao podes fazer mais amigos!");
-		printf("\n Pressiona uma tecla para voltar ...");
+		printf("\n You cannot add more friends!");
+		printf("\n Press any key to go back .....");
 		getch();
-		paginaPerfil(idAutor,1,idConta);
+		profilePage(authorId,1,targetAccountId);
 	}
 }
 
-void menuPub(char* fName, char* lName, int idAutor){
-	int op;
+void postMenu(char* firstName, char* lastName, int authorId){
+	int option;
 	system("CLS");
-	mostrarPubs(1,1,1,idAutor);
-	printf("\n 1) Criar Publicacao 2) Editar Publicacao 3) Excluir Publicacao");
-	printf("\n Opção: ");
-	scanf("%d",&op);
-	switch(op){
+	showPosts(1,1,1,authorId);
+	printf("\n 1) Create Post 2) Edit Post 3) Delete Post");
+	printf("\n Option: ");
+	scanf("%d",&option);
+	switch(option){
 		case 1:
-			criarPub(fName, lName, idAutor);
+			createPost(firstName, lastName, authorId);
 			break;
 		case 2:
-			editarPub(idAutor);
+			editPost(authorId);
 			break;
 		case 3:
-			eliminarPub(idAutor);
+			deletePost(authorId);
 			break;
 		default:
-			printf("\n Opção invalida");
+			printf("\n Invalid option");
 			printf("\n Press any key to continue......");
 			getch();
 			system("CLS");
-			menuPub(fName,lName,idAutor);
+			postMenu(firstName,lastName,authorId);
 			break;
 	}
 }
 
-void listaFriends(int idAutor){
+void friendsList(int authorId){
 	system("CLS");
-	interface();
-	int totalAmigos = contarAmigos(idAutor);
-	if(totalAmigos>0){
-		printf("\n Lista de Amigos: \n");
-		FILE *amgs;
-		amgs = fopen("ListaAmigos","rb");
-		if(amgs == NULL){
-			fclose(amgs);
-			amgs = fopen("ListaAmigos","ab");
-			fclose(amgs);
-			listaFriends(idAutor);
+	showInterface();
+	int totalFriends = countFriends(authorId);
+	if(totalFriends>0){
+		printf("\n Friends List: \n");
+		FILE *friendsFile;
+		friendsFile = fopen("friendships","rb");
+		if(friendsFile == NULL){
+			fclose(friendsFile);
+			friendsFile = fopen("friendships","ab");
+			fclose(friendsFile);
+			friendsList(authorId);
 		}
-		struct amigos amigos;
-		while(fread(&amigos,sizeof(amigos),1,amgs)){
-			if(amigos.numeroConta == idAutor){
-				printf("\n 1: %d -> %s %s",amigos.idSeguido,amigos.fName,amigos.lName);
-			}else if(amigos.idSeguido == idAutor){
-				printf("\n 2: %d -> %s %s",amigos.numeroConta,amigos.fNameS,amigos.lNameS);
+		struct Friendship friendship;
+		while(fread(&friendsCount,sizeof(friendship),1,friendsFile)){
+			if(friendsCount.accountId == authorId){
+				printf("\n 1: %d -> %s %s",friendsCount.friendId,friendsCount.firstName,friendsCount.lastName);
+			}else if(friendsCount.friendId == authorId){
+				printf("\n 2: %d -> %s %s",friendsCount.accountId,friendsCount.sourceFirstName,friendsCount.sourceLastName);
 			}
 		}
-		int op;
-		printf("\n\n 1) Desfazer Amizada 2) Voltar");
-		printf("\n Opção: ");
-		scanf("%d",&op);
-		switch(op){
+		int option;
+		printf("\n\n 1) Remove Friendship 2) Back");
+		printf("\n Option: ");
+		scanf("%d",&option);
+		switch(option){
 			case 1:
-				fclose(amgs);
-				desfazerFriend(idAutor);
+				fclose(friendsFile);
+				removeFriend(authorId);
 				break;
 			case 2:
-				fclose(amgs);
-				friendster(idAutor);
+				fclose(friendsFile);
+				friendsterMenu(authorId);
 				break;
 			default:
-				fclose(amgs);
-				printf("\n Opção invalida, tente novamente mais tarde!");
+				fclose(friendsFile);
+				printf("\n Invalid option, tente novamente mais tarde!");
 				printf("\n Press any key to continue......");
 				getch();
-				listaFriends(idAutor);
+				friendsList(authorId);
 				break;
 		}
 	}else{
-		printf("\n Ainda nao tens amigos! \n");
-		int op;
-		printf("\n\n 1) Voltar");
-		printf("\n Opção: ");
-		scanf("%d",&op);
-		switch(op){
+		printf("\n You don't have any friends yet! \n");
+		int option;
+		printf("\n\n 1) Back");
+		printf("\n Option: ");
+		scanf("%d",&option);
+		switch(option){
 			case 1:
-				friendster(idAutor);
+				friendsterMenu(authorId);
 				break;
 			default:
-				printf("\n Opção invalida, tente novamente mais tarde!");
+				printf("\n Invalid option, tente novamente mais tarde!");
 				printf("\n Press any key to continue......");
 				getch();
-				listaFriends(idAutor);
+				friendsList(authorId);
 				break;
 		}
 	}
 }
 
-void desfazerFriend(int idAutor){
+void removeFriend(int authorId){
 	system("CLS");
-	interface();
-	FILE *amgs;
-	amgs = fopen("ListaAmigos","rb");
-	FILE *aux;
-	aux = fopen("aux","wb");
-	struct amigos amigos;
-	printf("\n Qual o id que quer desfazer amizade? ");
+	showInterface();
+	FILE *friendsFile;
+	friendsFile = fopen("friendships","rb");
+	FILE *tmp;
+	tmp = fopen("tmp","wb");
+	struct Friendship friendship;
+	printf("\n Which ID do you want to remove as a friend? ");
 	printf("\n ID: ");
 	int id,removido=0;
 	scanf("%d",&id);
-	
-	while(fread(&amigos,sizeof(amigos),1,amgs)){
-		if(amigos.idSeguido == id && amigos.numeroConta == idAutor){
+
+	while(fread(&friendsCount,sizeof(friendship),1,friendsFile)){
+		if(friendsCount.friendId == id && friendsCount.accountId == authorId){
 			removido = 1;
 		}else{
-			fwrite(&amigos,sizeof(amigos),1,aux);
+			fwrite(&friendsCount,sizeof(friendship),1,tmp);
 		}
 	}
-	
-	fclose(aux);
-	fclose(amgs);
-	printf("\n\n Amigo removido com sucesso.\n");
-	printf("\n Pressiona qualquer tecla para continuar...");
+
+	fclose(tmp);
+	fclose(friendsFile);
+	printf("\n\n Friend removed successfully.\n");
+	printf("\n Press any key to continue......");
 	getch();
 	if(removido == 1){
-		remove("ListaAmigos");
-		rename("aux","ListaAmigos");
+		remove("friendships");
+		rename("tmp","friendships");
 	}
-	listaFriends(idAutor);
+	friendsList(authorId);
 }
 
-void editarPub(int idAutor){
+void editPost(int authorId){
 	system("CLS");
-	FILE *pubs;
-    pubs = fopen("pubs","rb");
-    if(pubs == NULL){
+	FILE *postsFile;
+    postsFile = fopen("posts","rb");
+    if(postsFile == NULL){
     	printf("1 ERROR: File not open");
-    	fclose(pubs);
-    	pubs = fopen("pubs","ab");
-    	fclose(pubs);
+    	fclose(postsFile);
+    	postsFile = fopen("posts","ab");
+    	fclose(postsFile);
 		getch();
-		eliminarPub(idAutor);
+		deletePost(authorId);
 	}
-	FILE *auxfile;
-	auxfile = fopen("auxfile","wb");
-	
-	struct publicacao publicacao;
-	int aux, i=0, editar = 0,idPub,op;
-	char password[50]={},texto[150];
-	
-	printf("\n Qual o id da publicacao que quer editar? \n ID: ");
-	scanf("%d",&idPub);
-	while(fread(&publicacao,sizeof(publicacao),1,pubs)){
-		if((publicacao.numeroConta==idAutor)&&(publicacao.idPub==idPub)){
-			printf("\n Texto: ");
+	FILE *tmpFile;
+	tmpFile = fopen("tmpFile","wb");
+
+	struct Post post;
+	int tmp, i=0, editar = 0,postId,option;
+	char password[50]={},textInput[150];
+
+	printf("\n Which post ID do you want to edit? \n ID: ");
+	scanf("%d",&postId);
+	while(fread(&post,sizeof(post),1,postsFile)){
+		if((post.accountId==authorId)&&(post.postId==postId)){
+			printf("\n textInput: ");
 			fflush(stdin);
-			gets(texto);
-			if(strlen(texto)>sizeof(texto)){
-				printf("\n Uma publicação so pode ter ate 150 caracteres, por favor tente outra vez\n");
+			gets(textInput);
+			if(strlen(textInput)>sizeof(textInput)){
+				printf("\n A post can have up to 150 characters, please try again\n");
 				printf("\n Press any key to continue......");
 				getch();
-				editarPub(idAutor);
-			} 
-			strcpy(publicacao.frase, texto);
-			printf("\n Tipo de Publicacao? (1-Publica, 2-Reservada, 3-Privada)");
-			printf("\n Opcao: ");
-			scanf("%d",&op);
-			switch(op){
+				editPost(authorId);
+			}
+			strcpy(post.text, textInput);
+			printf("\n Post visibility? (1-Public, 2-Restricted, 3-Private)");
+			printf("\n Option: ");
+			scanf("%d",&option);
+			switch(option){
 				case 1:
-					publicacao.tipoPub = 1;
+					post.visibility = 1;
 					break;
 				case 2:
-					publicacao.tipoPub = 2;
+					post.visibility = 2;
 					break;
 				case 3:
-					publicacao.tipoPub = 3;
+					post.visibility = 3;
 					break;
 				default:
-					printf("\n Tipo invalido, tente novamente mais tarde!");
+					printf("\n Invalid type, please try again later!");
 					printf("\n Press any key to continue......");
 					getch();
-					editarPub(idAutor);
+					editPost(authorId);
 					break;
 			}
-			fwrite(&publicacao,sizeof(publicacao),1, auxfile);
+			fwrite(&post,sizeof(post),1, tmpFile);
 			editar = 1;
 		}else{
-			fwrite(&publicacao,sizeof(publicacao),1, auxfile);
+			fwrite(&post,sizeof(post),1, tmpFile);
 		}
 	}
 	if(editar == 0){
 		system("CLS");
-		printf("\n Id da publicacao nao econtrado, por favor tente novamente mais tarde!");
-		printf("\n Pressiona qualquer tecla para continuar...");
+		printf("\n Post ID not found, please try again later!");
+		printf("\n Press any key to continue......");
 		getch();
-		remove("auxfile");
-		paginaPerfil(idAutor,0,0);
+		remove("tmpFile");
+		profilePage(authorId,0,0);
 	}
-	fclose(pubs);
-	fclose(auxfile);
-	printf("\n\n Publicacao editada com sucesso.\n");
-	printf("\n Pressiona qualquer tecla para continuar...");
+	fclose(postsFile);
+	fclose(tmpFile);
+	printf("\n\n Post edited successfully.\n");
+	printf("\n Press any key to continue......");
 	getch();
 	if(editar == 1){
-		remove("pubs");
-		rename("auxfile","pubs");
+		remove("posts");
+		rename("tmpFile","posts");
 	}
-	paginaPerfil(idAutor,0,0);
+	profilePage(authorId,0,0);
 }
 
-void eliminarPub(int idAutor){
-	char op[25];
+void deletePost(int authorId){
+	char option[25];
 	system("CLS");
-	printf("\n =======AVISO=======");
-    printf("\n Esta ação é irreversível.\n\n");
-	printf("\n Deseja Continuar? (sim ou nao)\n ");
-	scanf("%s",op);
-	if(!strcmp(op,"nao")||!strcmp(op,"Nao")){
-		paginaPerfil(idAutor,0,0);
+	printf("\n =======WARNING=======");
+    printf("\n This action is irreversible.\n\n");
+	printf("\n Do you want to continue? (yes or no)\n ");
+	scanf("%s",option);
+	if(!strcmp(option,"nao")||!strcmp(option,"Nao")||!strcmp(option,"no")||!strcmp(option,"No")){
+		profilePage(authorId,0,0);
 	}
-	
-    FILE *pubs;
-    pubs = fopen("pubs","rb");
-    if(pubs == NULL){
+
+    FILE *postsFile;
+    postsFile = fopen("posts","rb");
+    if(postsFile == NULL){
     	printf("1 ERROR: File not open");
-    	fclose(pubs);
-    	pubs = fopen("pubs","ab");
-    	fclose(pubs);
+    	fclose(postsFile);
+    	postsFile = fopen("posts","ab");
+    	fclose(postsFile);
 		getch();
-		eliminarPub(idAutor);
+		deletePost(authorId);
 	}
-	FILE *auxfile;
-	auxfile = fopen("auxfile","wb");
-	
-	struct publicacao publicacao;
-	int aux, i=0, apagar = 0,idPub;
+	FILE *tmpFile;
+	tmpFile = fopen("tmpFile","wb");
+
+	struct Post post;
+	int tmp, i=0, apagar = 0,postId;
 	char password[50]={};
-	printf("\n Qual o id da publicacao que quer eliminar? \n ID: ");
-	scanf("%d",&idPub);
-	while(fread(&publicacao,sizeof(publicacao),1,pubs)){
-		if((publicacao.numeroConta==idAutor)&&(publicacao.idPub==idPub)){
+	printf("\n Which post ID do you want to delete? \n ID: ");
+	scanf("%d",&postId);
+	while(fread(&post,sizeof(post),1,postsFile)){
+		if((post.accountId==authorId)&&(post.postId==postId)){
 			apagar = 1;
 		}else{
-			fwrite(&publicacao,sizeof(publicacao),1, auxfile);
+			fwrite(&post,sizeof(post),1, tmpFile);
 		}
 	}
 	if(apagar == 0){
 		system("CLS");
-		printf("\n Id da publicacao nao econtrado, por favor tente novamente mais tarde!");
-		printf("\n Pressiona qualquer tecla para continuar...");
+		printf("\n Post ID not found, please try again later!");
+		printf("\n Press any key to continue......");
 		getch();
-		remove("auxfile");
-		paginaPerfil(idAutor,0,0);
+		remove("tmpFile");
+		profilePage(authorId,0,0);
 	}
-	fclose(pubs);
-	fclose(auxfile);
-	printf("\n\n Publicacao eliminada com sucesso.\n");
-	printf("\n Pressiona qualquer tecla para continuar...");
+	fclose(postsFile);
+	fclose(tmpFile);
+	printf("\n\n Post deleted successfully.\n");
+	printf("\n Press any key to continue......");
 	getch();
 	if(apagar == 1){
-		remove("pubs");
-		rename("auxfile","pubs");
+		remove("posts");
+		rename("tmpFile","posts");
 	}
-	paginaPerfil(idAutor,0,0);
+	profilePage(authorId,0,0);
 }
 
-int contarPub(int idAutor, int tipoContador){
-	if (tipoContador == 0){
-		//contar quantas publicações o autor tem
-		int contadorpubs = 0;
-		FILE *pub;
-		pub = fopen("pubs","rb");
-		struct publicacao publicacao;
-		if (pub == NULL){
+int countPosts(int authorId, int counterType){
+	if (counterType == 0){
+
+		int postCount = 0;
+		FILE *postFile;
+		postFile = fopen("posts","rb");
+		struct Post post;
+		if (postFile == NULL){
 			printf("4 ERROR: File not open");
-			fclose(pub);
-			pub = fopen("pubs","ab");
-			fclose(pub);
+			fclose(postFile);
+			postFile = fopen("posts","ab");
+			fclose(postFile);
 			printf("\nTry Again ....");
 			getch();
-			contarPub(idAutor,tipoContador);
+			countPosts(authorId,counterType);
 		}
-		while(fread(&publicacao,sizeof(publicacao),1,pub)){
-			if(publicacao.numeroConta == idAutor){
-				contadorpubs = contadorpubs + 1;
+		while(fread(&post,sizeof(post),1,postFile)){
+			if(post.accountId == authorId){
+				postCount = postCount + 1;
 			}
 		}
-		fclose(pub);
-		return contadorpubs;
-	}else if(tipoContador == 1){
-		//contar quantas publicações o autor tem
-		int contadorpubs = 0;
-		FILE *pub;
-		pub = fopen("pubs","rb");
-		struct publicacao publicacao;
-		if (pub == NULL){
+		fclose(postFile);
+		return postCount;
+	}else if(counterType == 1){
+
+		int postCount = 0;
+		FILE *postFile;
+		postFile = fopen("posts","rb");
+		struct Post post;
+		if (postFile == NULL){
 			printf("4 ERROR: File not open");
-			fclose(pub);
-			pub = fopen("pubs","ab");
-			fclose(pub);
+			fclose(postFile);
+			postFile = fopen("posts","ab");
+			fclose(postFile);
 			printf("\nTry Again ....");
 			getch();
-			contarPub(idAutor, tipoContador);
+			countPosts(authorId, counterType);
 		}
-		while(fread(&publicacao,sizeof(publicacao),1,pub)){
-			contadorpubs = contadorpubs + 1;
+		while(fread(&post,sizeof(post),1,postFile)){
+			postCount = postCount + 1;
 		}
-		fclose(pub);
-		return contadorpubs;
+		fclose(postFile);
+		return postCount;
 	}
 }
 
-void tipoContaUser(int idAutor, char* tipoConta){
-	char tContaUser[TAMANHOSTR];
-	FILE *log;
-	log = fopen("bd1","rb");
-	struct user user;
-	if (log == NULL){
+void getAccountType(int authorId, char* accountType){
+	char accountTypeStr[STR_SIZE];
+	FILE *usersFileR;
+	usersFileR = fopen("users","rb");
+	struct User user;
+	if (usersFileR == NULL){
 		printf("5 ERROR: File not open");
-		fclose(log);
-		log = fopen("bd1","ab");
-		fclose(log);
+		fclose(usersFileR);
+		usersFileR = fopen("users","ab");
+		fclose(usersFileR);
 		printf("\nTry Again ....");
 		getch();
-		tipoContaUser(idAutor, tipoConta);
+		getAccountType(authorId, accountType);
 	}
-	while(fread(&user,sizeof(user),1,log)){
-		if(user.numeroConta == idAutor){
-			if(user.tipoConta == 1){
-				strcpy(tContaUser, "Privada");
-			}else if(user.tipoConta == 0){
-				strcpy(tContaUser, "Publica");
+	while(fread(&user,sizeof(user),1,usersFileR)){
+		if(user.accountId == authorId){
+			if(user.accountType == 1){
+				strcpy(accountTypeStr, "Private");
+			}else if(user.accountType == 0){
+				strcpy(accountTypeStr, "Public");
 			}
 		}
 	}
-	fclose(log);
-	strcpy(tipoConta, tContaUser);
+	fclose(usersFileR);
+	strcpy(accountType, accountTypeStr);
 }
 
-void criarPub(char* fName,char* lName, int idAutor){
+void createPost(char* firstName,char* lastName, int authorId){
 	system("CLS");
-	FILE *pubs;
-	pubs = fopen("pubs","ab");
-	struct publicacao publicacao;
+	FILE *postsFile;
+	postsFile = fopen("posts","ab");
+	struct Post post;
 	time_t rawtime;
 	struct tm * timeinfo;
 	time ( &rawtime );
 	timeinfo = localtime ( &rawtime );
-	char rData[50];
-	strcpy(rData,asctime(timeinfo));
-	char frase[150];
-	printf("\n Criar Publicação (lembrando)");
-	printf("\n O que quer escrever? ");
+	char rawDate[50];
+	strcpy(rawDate,asctime(timeinfo));
+	char text[150];
+	printf("\n Create Post");
+	printf("\n What would you like to write? ");
 	fflush(stdin);
-	gets(frase);
-	if(strlen(frase)>sizeof(frase)){
-		printf("Uma publicação so pode ter ate 150 caracteres, por favor tente outra vez\n");
+	gets(text);
+	if(strlen(text)>sizeof(text)){
+		printf("A post can have up to 150 characters, please try again\n");
 		printf("\nPress any key to continue......");
 		getch();
-		criarPub(fName,lName,idAutor);
-	} 
-	
-	int numPubs = contarPub(idAutor,1);
-	
-	printf("\n Que tipo de publicação quer?\n 1) Publica 2) Reservada 3) Privada");
-	printf("\n Opção: ");
-	int op;
-	fflush(stdin);scanf("%d",&op);
-	switch(op){
+		createPost(firstName,lastName,authorId);
+	}
+
+	int numPosts = countPosts(authorId,1);
+
+	printf("\n Which type of post do you want?\n 1) Public 2) Restricted 3) Private");
+	printf("\n Option: ");
+	int option;
+	fflush(stdin);scanf("%d",&option);
+	switch(option){
 		case 1:
-			publicacao.tipoPub = 1;
+			post.visibility = 1;
 			break;
 		case 2:
-			publicacao.tipoPub = 2;
+			post.visibility = 2;
 			break;
 		case 3:
-			publicacao.tipoPub = 3;
+			post.visibility = 3;
 			break;
 		default:
-			printf("\n Tipo invalido, tente novamente mais tarde!");
+			printf("\n Invalid type, please try again later!");
 			printf("\n Press any key to continue......");
 			getch();
-			criarPub(fName,lName,idAutor);
+			createPost(firstName,lastName,authorId);
 			break;
 	}
-	
-	strcpy(publicacao.frase, frase);
-	strcpy(publicacao.data, rData);
-	publicacao.numeroConta = idAutor;
-	strcpy(publicacao.fname, fName);
-	strcpy(publicacao.lname, lName);
-	publicacao.idPub = numPubs;
-	fwrite(&publicacao,sizeof(publicacao),1,pubs);
-	fclose(pubs);
-	paginaPerfil(idAutor, 0,0);
-	
+
+	strcpy(post.text, text);
+	strcpy(post.dateStr, rawDate);
+	post.accountId = authorId;
+	strcpy(post.firstName, firstName);
+	strcpy(post.lastName, lastName);
+	post.postId = numPosts;
+	fwrite(&post,sizeof(post),1,postsFile);
+	fclose(postsFile);
+	profilePage(authorId, 0,0);
+
 }
 
-void editarConta(int idAutor){
+void editAccount(int authorId){
 	system("CLS");
-	interface();
-	
-	FILE *bd1;	
-	bd1 = fopen("bd1","rb");
-	
-	FILE *auxfile;
-	auxfile = fopen("auxfile","wb");
-	
-	struct user user;
+	showInterface();
+
+	FILE *usersFile;
+	usersFile = fopen("users","rb");
+
+	FILE *tmpFile;
+	tmpFile = fopen("tmpFile","wb");
+
+	struct User user;
 	char resposta[50];
 	int editar = 0;
 	int i=1;
-	while(fread(&user,sizeof(user),1,bd1)){
-		if(idAutor == user.numeroConta){
-			printf("\n Quer editar o nome [ %s %s ]? (sim ou nao)",user.fName,user.lName);
-			printf("\n Opção: ");
+	while(fread(&user,sizeof(user),1,usersFile)){
+		if(authorId == user.accountId){
+			printf("\n Do you want to edit the name [ %s %s ]? (yes or no)",user.firstName,user.lastName);
+			printf("\n Option: ");
 			scanf("%s",resposta);
-			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")){
-				printf("\n Primeiro Nome: ");
-				scanf("%s",user.fName);
-				printf(" Apelido: ");
-				scanf("%s",user.lName);
-				if(strlen(user.fName)>sizeof(user.fName)||strlen(user.lName)>sizeof(user.lName)){
-					printf("Nome muito grande, tente novamente mais tarde!");
+			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")||!strcmp(resposta,"yes")||!strcmp(resposta,"Yes")){
+				printf("\n First Name: ");
+				scanf("%s",user.firstName);
+				printf(" Last Name: ");
+				scanf("%s",user.lastName);
+				if(strlen(user.firstName)>sizeof(user.firstName)||strlen(user.lastName)>sizeof(user.lastName)){
+					printf("Name too long, please try again later!");
 					printf("\nPress any key to continue......");
 					getch();
-					paginaPerfil(idAutor,0,0);
+					profilePage(authorId,0,0);
 				}
 			}
 			system("CLS");
-			interface();
-			printf("\n Quer editar o email [ %s ]? (sim ou nao)",user.email);
-			printf("\n Opção: ");
+			showInterface();
+			printf("\n Do you want to edit the email [ %s ]? (yes or no)",user.email);
+			printf("\n Option: ");
 			scanf("%s",resposta);
-			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")){
+			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")||!strcmp(resposta,"yes")||!strcmp(resposta,"Yes")){
 				printf("\n Email: ");
 				scanf("%s",user.email);
 				if(strlen(user.email)>sizeof(user.email)){
-					printf("Email muito grande, tente novamente mais tarde!");
+					printf("Email too long, please try again later!");
 					printf("\nPress any key to continue......");
 					getch();
-					paginaPerfil(idAutor,0,0);
+					profilePage(authorId,0,0);
 				}
 			}
 			system("CLS");
-			interface();
-			printf("\n Quer editar a data de nascimento [ %d/%d/%d ]? (sim ou nao)",user.dia,user.mes,user.ano);
-			printf("\n Opção: ");
+			showInterface();
+			printf("\n Do you want to edit the birth date [ %d/%d/%d ]? (yes or no)",user.day,user.month,user.year);
+			printf("\n Option: ");
 			scanf("%s",resposta);
-			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")){
-				int rdia,rmes,rano,erro=0;
-				printf("\n Data de nascimento (DD/MM/AAAA): ");
-				scanf("%d/%d/%d",&rdia,&rmes,&rano);
-				if(rdia>=1&&rdia<=31){
-					if(rmes>=1&&rmes<=12){
-						if(rano>=1900&&rano<=2022){
-							switch(rmes){
+			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")||!strcmp(resposta,"yes")||!strcmp(resposta,"Yes")){
+				int rday,rmonth,ryear,errorFlag=0;
+				printf("\n Birth date (DD/MM/YYYY): ");
+				scanf("%d/%d/%d",&rday,&rmonth,&ryear);
+				if(rday>=1&&rday<=31){
+					if(rmonth>=1&&rmonth<=12){
+						if(ryear>=1900&&ryear<=2022){
+							switch(rmonth){
 								case 1:
 								case 3:
 								case 5:
@@ -1189,26 +1166,26 @@ void editarConta(int idAutor){
 								case 8:
 								case 10:
 								case 12:
-									user.dia = rdia;
-									user.mes = rmes;
-									user.ano = rano;
+									user.day = rday;
+									user.month = rmonth;
+									user.year = ryear;
 									break;
 								case 2:
-									if(rano%4==0){
-										if(rdia<30){
-											user.dia = rdia;
-											user.mes = rmes;
-											user.ano = rano;
+									if(ryear%4==0){
+										if(rday<30){
+											user.day = rday;
+											user.month = rmonth;
+											user.year = ryear;
 										}else{
-											erro = 1;
+											errorFlag = 1;
 										}
 									}else{
-										if(rdia<29){
-											user.dia = rdia;
-											user.mes = rmes;
-											user.ano = rano;
+										if(rday<29){
+											user.day = rday;
+											user.month = rmonth;
+											user.year = ryear;
 										}else{
-											erro = 1;	
+											errorFlag = 1;
 										}
 									}
 									break;
@@ -1216,76 +1193,76 @@ void editarConta(int idAutor){
 								case 6:
 								case 9:
 								case 11:
-									if(rdia<31){
-										user.dia = rdia;
-										user.mes = rmes;
-										user.ano = rano;
+									if(rday<31){
+										user.day = rday;
+										user.month = rmonth;
+										user.year = ryear;
 									}else{
-										erro = 1;
+										errorFlag = 1;
 									}
-									break;	
-								default: 
-									erro = 1;
 									break;
-							}					
-							
+								default:
+									errorFlag = 1;
+									break;
+							}
+
 						}else{
-						
-							erro = 1;
+
+							errorFlag = 1;
 						}
 					}else{
-					
-						erro = 1;
+
+						errorFlag = 1;
 					}
 				}else{
-					
-					erro = 1;
+
+					errorFlag = 1;
 				}
-				if(erro == 1){
-					printf("Data de nascimento incorreto, tente novamente mais tarde!");
+				if(errorFlag == 1){
+					printf("Invalid birth date, please try again later!");
 					printf("\nPress any key to continue......");
 					getch();
-					paginaPerfil(idAutor,0,0);
+					profilePage(authorId,0,0);
 				}
-				
+
 			}
 			system("CLS");
-			interface();
-			printf("\n Quer editar o numero de telemovel [ %d ]? (sim ou nao)",user.numeroTelemovel);
-			printf("\n Opção: ");
+			showInterface();
+			printf("\n Do you want to edit the phone number [ %d ]? (yes or no)",user.phoneNumber);
+			printf("\n Option: ");
 			scanf("%s",resposta);
-			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")){
-				printf("\n Numero de Telemovel: ");
-				scanf("%s",user.numeroTelemovel);
-				if(user.numeroTelemovel>999999999||user.numeroTelemovel<900000000){
-					printf("Numero de Telemovel incorreto, tente novamente mais tarde!");
+			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")||!strcmp(resposta,"yes")||!strcmp(resposta,"Yes")){
+				printf("\n Phone Number: ");
+				scanf("%s",user.phoneNumber);
+				if(user.phoneNumber>999999999||user.phoneNumber<900000000){
+					printf("Invalid phone number, please try again later!");
 					printf("\nPress any key to continue......");
 					getch();
-					paginaPerfil(idAutor,0,0);
+					profilePage(authorId,0,0);
 				}
 			}
 			system("CLS");
-			interface();
-			printf("\n Quer editar a password? (sim ou nao)",user.password);
-			printf("\n Opção: ");
+			showInterface();
+			printf("\n Do you want to edit the password? (yes or no)",user.password);
+			printf("\n Option: ");
 			scanf("%s",resposta);
-			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")){
+			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")||!strcmp(resposta,"yes")||!strcmp(resposta,"Yes")){
 				int i = 0;
 				char password[50],ch;
 				int cPos=0;
 
-				printf(" Password (Minimo 6 caracteres):");
+				printf(" Password (Minimum 6 characters):");
 				while(1){
 					ch = getch();
-					if(ch==13){ // Enter
+					if(ch==13){
 						break;
-					}else if(ch==8){ // BackSpace
+					}else if(ch==8){
 						if(cPos>0){
 							cPos--;
 							password[cPos] = '\0';
 							printf("\b \b");
 						}
-					}else if(ch==32||ch==9){ //Espaço ou Tab
+					}else if(ch==32||ch==9){
 						continue;
 					}else{
 						password[cPos] = ch;
@@ -1294,243 +1271,238 @@ void editarConta(int idAutor){
 					}
 				}
 				if(strlen(password)>sizeof(password)){
-					printf("\n Password muito grande, tente novamente mais tarde!");
+					printf("\n Password too long, please try again later!");
 					printf("\n Press any key to continue......");
 					getch();
-					paginaPerfil(idAutor,0,0);
+					profilePage(authorId,0,0);
 				}
 				strcpy(user.password, password);
 			}
 			system("CLS");
-			interface();
-			printf("\n Quer editar a descriçao da sua conta? (sim ou nao)",user.desc);
-			printf("\n Opção: ");
+			showInterface();
+			printf("\n Do you want to edit your account description? (yes or no)",user.description);
+			printf("\n Option: ");
 			scanf("%s",resposta);
-			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")){
-				char desc[50];
-				printf("\n Descrição: ");
+			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")||!strcmp(resposta,"yes")||!strcmp(resposta,"Yes")){
+				char description[50];
+				printf("\n Description: ");
 				fflush(stdin);
-				gets(desc);
-				if(strlen(desc)>sizeof(desc)){
-					printf("Uma descrição so pode ter ate 50 caracteres, tente novamente mais tarde!");
+				gets(description);
+				if(strlen(description)>sizeof(description)){
+					printf("A description can have up to 50 characters, please try again later!");
 					printf("\nPress any key to continue......");
 					getch();
-					paginaPerfil(idAutor,0,0);
+					profilePage(authorId,0,0);
 				}
-				strcpy(user.desc,desc);
+				strcpy(user.description,description);
 			}
 			system("CLS");
-			interface();
-			printf("\n Quer editar o estado da sua conta? (sim ou nao)",user.desc);
-			printf("\n Opção: ");
+			showInterface();
+			printf("\n Do you want to change your account visibility? (yes or no)",user.description);
+			printf("\n Option: ");
 			scanf("%s",resposta);
-			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")){
-				int op;
-				printf("\n Estado de Conta [1) Publica 2) Privada]: ");
-				scanf("%d",&op);
-				switch(op){
+			if(!strcmp(resposta,"sim")||!strcmp(resposta,"Sim")||!strcmp(resposta,"yes")||!strcmp(resposta,"Yes")){
+				int option;
+				printf("\n Account Visibility [1) Public 2) Private]: ");
+				scanf("%d",&option);
+				switch(option){
 					case 1:
-						user.tipoConta = 0;
+						user.accountType = 0;
 						break;
 					case 2:
-						user.tipoConta = 1;
+						user.accountType = 1;
 						break;
 					default:
-						printf("Tipo de conta invalido, tente novamente mais tarde!");
+						printf("Invalid account type, please try again later!");
 						printf("\nPress any key to continue......");
 						getch();
-						paginaPerfil(idAutor,0,0);
+						profilePage(authorId,0,0);
 						break;
 				}
 			}
 			editar = 1;
-			fwrite(&user,sizeof(user),1,auxfile);
+			fwrite(&user,sizeof(user),1,tmpFile);
 		}else{
-			fwrite(&user,sizeof(user),1,auxfile);
+			fwrite(&user,sizeof(user),1,tmpFile);
 		}
 	}
-	fclose(bd1);
-	fclose(auxfile);
-	printf("\n\n Conta editada com sucesso.\n");
-	printf("\n Pressiona qualquer tecla para continuar...");
+	fclose(usersFile);
+	fclose(tmpFile);
+	printf("\n\n Account updated successfully.\n");
+	printf("\n Press any key to continue......");
 	if(editar == 1){
-		remove("bd1");
+		remove("users");
 		getch();
-		rename("auxfile","bd1");
+		rename("tmpFile","users");
 	}
-	paginaPerfil(idAutor,0,0);
+	profilePage(authorId,0,0);
 }
 
-//Friendster
-
-//Registar Conta
-
-void registarConta(){
+void registerAccount(){
 	system("CLS");
-	
-	int idConta = verificarIdConta();
-	
-	FILE *reg;
-	reg = fopen("bd1","ab"); //Modo escrever
 
-	struct user user;
-	
+	int targetAccountId = nextAccountId();
+
+	FILE *usersFileW;
+	usersFileW = fopen("users","ab");
+
+	struct User user;
+
 	char firstname[50],lastname[50],email[50],username[50],password[50];
-	int dia,mes,ano;
-	int telemovel;
-	
-	if(idConta<=200){
-		//Registro Primeiro Nome
-		registroFirstName(firstname);
-		strcpy(user.fName, firstname);
-		//Registro Ultimo Nome
-		registroLastName(lastname);
-		strcpy(user.lName, lastname);
-		//Registro Email
-		registroEmail(email);
+	int day,month,year;
+	int phone;
+
+	if(targetAccountId<=200){
+
+		inputFirstName(firstname);
+		strcpy(user.firstName, firstname);
+
+		inputLastName(lastname);
+		strcpy(user.lastName, lastname);
+
+		inputEmail(email);
 		strcpy(user.email, email);
-		//registro Numero Telemovel
-		registroTelemovel(&telemovel);
-		user.numeroTelemovel = telemovel;
-		//registro Data Nascimento
-		registroNascimento(&dia,&mes,&ano);
-		user.dia = dia;
-		user.mes = mes;
-		user.ano = ano;
-		
-		//registro Username
-		registroUsername(username);
+
+		inputPhone(&phone);
+		user.phoneNumber = phone;
+
+		inputBirthDate(&day,&month,&year);
+		user.day = day;
+		user.month = month;
+		user.year = year;
+
+		inputUsername(username);
 		strcpy(user.username, username);
-		//Registro Password
-		registroPassword(password);
+
+		inputPassword(password);
 		strcpy(user.password, password);
-		//Infos default para todos os users criados
-		user.numeroConta = idConta;
-		user.amigos = 0;
-		user.tipoConta = 0;
-		strcpy(user.desc, "Ainda sem Descrição!");
+
+		user.accountId = targetAccountId;
+		user.friendsCount = 0;
+		user.accountType = 0;
+		strcpy(user.description, "Ainda sem Descriï¿½ï¿½o!");
 		/* DEBUG:
-		printf("\n Conta Numero: %d", user.numeroConta); 
-	    printf("\n Nome: %s %s", user.fName, user.lName); 
+		printf("\n Account Number: %d", user.accountId);
+	    printf("\n name: %s %s", user.firstName, user.lastName);
 	    printf("\n Email: %s", user.email);
-	    printf("\n Telemovel: %ld", user.numeroTelemovel); 
-	    printf("\n Username: %s", user.username);   
-	    printf("\n Password: %s", user.password);   
-	    printf("\n Descrição: %s", user.desc);   
-	    printf("\n Amigos: %d", user.amigos);
-	    printf("\n Tipo de Conta: %d", user.tipoConta);
-	    printf("\n Data de Nascimento: %d/%d/%d", user.dia,user.mes,user.ano);
+	    printf("\n phone: %ld", user.phoneNumber);
+	    printf("\n Username: %s", user.username);
+	    printf("\n Password: %s", user.password);
+	    printf("\n Description: %s", user.description);
+	    printf("\n Friends: %d", user.friendsCount);
+	    printf("\n Account Type: %d", user.accountType);
+	    printf("\n Birth Date: %d/%d/%d", user.day,user.month,user.year);
 		*/
-		//Escrever Registro no File "reg"
-		fwrite(&user,sizeof(user),1,reg);
-		fclose(reg);
-		
-		printf("\n Registado com sucesso!\nAgora deve logar com a sua conta nova.");
+
+		fwrite(&user,sizeof(user),1,usersFileW);
+		fclose(usersFileW);
+
+		printf("\n Registered successfully!\nNow please log in with your new account.");
 		printf("\n Press any key to continue......");
 		getch();
 		system("CLS");
-		loginConta();
+		loginAccount();
 	}else{
-		printf("\n Infelizmente já temos 200 contas registadas na aplicação.\n O que impossibilita a criação de mais contas.");
+		printf("\n Unfortunately there are already 200 accounts registered in the application.\n It is not possible to create more accounts.");
 		printf("\n Press any key to continue......");
 		getch();
 		main();
 	}
 }
 
-int verificarIdConta(){
-	FILE *reg;
-	reg = fopen("bd1","rb");
-	if (reg == NULL){
+int nextAccountId(){
+	FILE *usersFileW;
+	usersFileW = fopen("users","rb");
+	if (usersFileW == NULL){
 		printf("7 ERROR: File not open");
-		fclose(reg);
-		reg = fopen("bd1","ab");
-		fclose(reg);
+		fclose(usersFileW);
+		usersFileW = fopen("users","ab");
+		fclose(usersFileW);
 		getch();
-		registarConta();
+		registerAccount();
 	}
-	struct user user;
-	int ultimoId;
-	while(fread(&user,sizeof(user),1,reg)){
-		ultimoId = user.numeroConta;
+	struct User user;
+	int lastId;
+	while(fread(&user,sizeof(user),1,usersFileW)){
+		lastId = user.accountId;
 	}
-	if (ultimoId>200||ultimoId<0)
-		ultimoId = 0;
-	fclose(reg);
-	return ultimoId+1;
+	if (lastId>200||lastId<0)
+		lastId = 0;
+	fclose(usersFileW);
+	return lastId+1;
 }
 
-void registroFirstName(char* firstname){
-	char fnome[TAMANHOSTR];
+void inputFirstName(char* firstname){
+	char firstTmp[STR_SIZE];
 	system("CLS");
-	interface();
-	printf("\n Primeiro Nome: ");
-	scanf("%s",fnome);
-	if(strlen(fnome)>sizeof(fnome)){
-		printf("Nome muito grande tente outra vez\n");
+	showInterface();
+	printf("\n First Name: ");
+	scanf("%s",firstTmp);
+	if(strlen(firstTmp)>sizeof(firstTmp)){
+		printf("Name too long, please try again\n");
 		printf("\nPress any key to continue......");
 		getch();
-		registroFirstName(firstname);
+		inputFirstName(firstname);
 	}else
-		strcpy(firstname, fnome);
+		strcpy(firstname, firstTmp);
 }
 
-void registroLastName(char* lastname){
-	char lnome[TAMANHOSTR];
+void inputLastName(char* lastname){
+	char lastTmp[STR_SIZE];
 	system("CLS");
-	interface();
-	printf("\n Ultimo Nome: ");
-	scanf("%s",lnome);
-	if(strlen(lnome)>sizeof(lnome)){
-		printf("Nome muito grande tente outra vez\n");
+	showInterface();
+	printf("\n Last Name: ");
+	scanf("%s",lastTmp);
+	if(strlen(lastTmp)>sizeof(lastTmp)){
+		printf("Name too long, please try again\n");
 		printf("\nPress any key to continue......");
 		getch();
-		registroLastName(lastname);
+		inputLastName(lastname);
 	}else
-		strcpy(lastname, lnome);
+		strcpy(lastname, lastTmp);
 }
 
-void registroEmail(char* email){
-	char mail[TAMANHOSTR];
+void inputEmail(char* email){
+	char mail[STR_SIZE];
 	int i, j=0;
 	system("CLS");
-	interface();
+	showInterface();
 	printf("\n Email: ");
 	scanf("%s",mail);
-	//Verificar se é um email valido, ou seja, se tem @ no email
+
 	for(i=0;i<=strlen(mail);i++){
 		if(mail[i]=='@')
 			j = 1;
 	}
 	if(strlen(mail)>sizeof(mail)){
-		printf("Email muito grande, tente outra vez\n");
+		printf("Email too long, please try again\n");
 		printf("\nPress any key to continue......");
 		getch();
-		registroEmail(email);
+		inputEmail(email);
 	}else if(strlen(mail)<10){
-		printf("Email muito pequeno, tente outra vez\n");
+		printf("Email too short, please try again\n");
 		printf("\nPress any key to continue......");
 		getch();
-		registroEmail(email);
+		inputEmail(email);
 	}else if(j==0){
-		printf("Email invalido\n");
+		printf("Invalid email\n");
 		printf("\nPress any key to continue......");
 		getch();
-		registroEmail(email);
+		inputEmail(email);
 	}else
 		strcpy(email, mail);
 }
 
-void registroNascimento(int* dia, int* mes,int* ano){
+void inputBirthDate(int* day, int* month,int* year){
 	system("CLS");
-	interface();
-	int rdia,rmes,rano,erro=0;
-	printf("\n Data de Nascimento (DD/MM/AAAA): ");
-	scanf("%d/%d/%d",&rdia,&rmes,&rano);
-	if(rdia>=1&&rdia<=31){
-		if(rmes>=1&&rmes<=12){
-			if(rano>=1900&&rano<=2022){
-				switch(rmes){
+	showInterface();
+	int rday,rmonth,ryear,errorFlag=0;
+	printf("\n Birth date (DD/MM/YYYY): ");
+	scanf("%d/%d/%d",&rday,&rmonth,&ryear);
+	if(rday>=1&&rday<=31){
+		if(rmonth>=1&&rmonth<=12){
+			if(ryear>=1900&&ryear<=2022){
+				switch(rmonth){
 					case 1:
 					case 3:
 					case 5:
@@ -1538,26 +1510,26 @@ void registroNascimento(int* dia, int* mes,int* ano){
 					case 8:
 					case 10:
 					case 12:
-						*dia = rdia;
-						*mes = rmes;
-						*ano = rano;
+						*day = rday;
+						*month = rmonth;
+						*year = ryear;
 						break;
 					case 2:
-						if(rano%4==0){
-							if(rdia<30){
-								*dia = rdia;
-								*mes = rmes;
-								*ano = rano;
+						if(ryear%4==0){
+							if(rday<30){
+								*day = rday;
+								*month = rmonth;
+								*year = ryear;
 							}else{
-								erro = 1;
+								errorFlag = 1;
 							}
 						}else{
-							if(rdia<29){
-								*dia = rdia;
-								*mes = rmes;
-								*ano = rano;
+							if(rday<29){
+								*day = rday;
+								*month = rmonth;
+								*year = ryear;
 							}else{
-								erro = 1;	
+								errorFlag = 1;
 							}
 						}
 						break;
@@ -1565,87 +1537,86 @@ void registroNascimento(int* dia, int* mes,int* ano){
 					case 6:
 					case 9:
 					case 11:
-						if(rdia<31){
-							*dia = rdia;
-							*mes = rmes;
-							*ano = rano;
+						if(rday<31){
+							*day = rday;
+							*month = rmonth;
+							*year = ryear;
 						}else{
-							erro = 1;
+							errorFlag = 1;
 						}
-						break;	
-					default: 
-						erro = 1;
 						break;
-				}					
-				
+					default:
+						errorFlag = 1;
+						break;
+				}
+
 			}else{
-			
-				erro = 1;
+
+				errorFlag = 1;
 			}
 		}else{
-		
-			erro = 1;
+
+			errorFlag = 1;
 		}
 	}else{
-		
-		erro = 1;
+
+		errorFlag = 1;
 	}
-	if(erro == 1){
-		printf("Data de nascimento incorreto!");
+	if(errorFlag == 1){
+		printf("Invalid birth date!");
 		printf("\nPress any key to continue......");
 		getch();
-		registroNascimento(dia,mes,ano);
+		inputBirthDate(day,month,year);
 	}
 }
 
-
-void registroTelemovel(int* telemovel){
-	int tele;
+void inputPhone(int* phone){
+	int phoneVal;
 	system("CLS");
-	interface();
-	printf("\n Numero de telemovel: ");
-	scanf("%ld",&tele);
-	if(tele<900000000||tele>999999999){
-		printf("Numero de telemovel incorreto!");
+	showInterface();
+	printf("\n Phone Number: ");
+	scanf("%ld",&phoneVal);
+	if(phoneVal<900000000||phoneVal>999999999){
+		printf("Invalid phone number!");
 		printf("\nPress any key to continue......");
 		getch();
-		registroTelemovel(telemovel);
+		inputPhone(phone);
 	}else
-		*telemovel = tele;
+		*phone = phoneVal;
 }
 
-void registroUsername(char* username){
-	char nome[50];
+void inputUsername(char* username){
+	char name[50];
 	system("CLS");
-	interface();
+	showInterface();
 	printf("\n Username: ");
-	scanf("%s",nome);
-	if(strlen(nome)>sizeof(nome)){
-		printf("Username muito grande tente outra vez\n");
+	scanf("%s",name);
+	if(strlen(name)>sizeof(name)){
+		printf("Username too long, please try again\n");
 		printf("\nPress any key to continue......");
 		getch();
-		registroUsername(username);
+		inputUsername(username);
 	}else
-		strcpy(username, nome);
+		strcpy(username, name);
 }
 
-void registroPassword(char* password){
+void inputPassword(char* password){
 	char pass[50] = {},pass2[50] = {},ch;
 	int cPos=0;
 	system("CLS");
-	interface();
-	printf("\n Password (Minimo 6 caracteres):");
+	showInterface();
+	printf("\n Password (Minimum 6 characters):");
 	while(1){
 		ch = getch();
-		if(ch==13){ // Enter
+		if(ch==13){
 			break;
-		}else if(ch==8){ // BackSpace
+		}else if(ch==8){
 			if(cPos>0){
 				cPos--;
 				pass[cPos] = '\0';
 				printf("\b \b");
 			}
-		}else if(ch==32||ch==9){ //Espaço ou Tab
+		}else if(ch==32||ch==9){
 			continue;
 		}else{
 			pass[cPos] = ch;
@@ -1657,15 +1628,15 @@ void registroPassword(char* password){
 	printf("\n Confirm Password:");
 	while(1){
 		ch = getch();
-		if(ch==13){ // Enter
+		if(ch==13){
 			break;
-		}else if(ch==8){ // BackSpace
+		}else if(ch==8){
 			if(cPos>0){
 				cPos--;
 				pass2[cPos] = '\0';
 				printf("\b \b");
 			}
-		}else if(ch==32||ch==9){ //Espaço ou Tab
+		}else if(ch==32||ch==9){
 			continue;
 		}else{
 			pass2[cPos] = ch;
@@ -1673,34 +1644,30 @@ void registroPassword(char* password){
 			printf("*");
 		}
 	}
-	int valor = strcmp(pass,pass2);
+	int cmpResult = strcmp(pass,pass2);
 	if(strlen(pass)>sizeof(pass)){
-		printf("\n Password muito grande, tente outra vez\n");
+		printf("\n Password too long, please try again\n");
 		printf("\n Press any key to continue......");
 		getch();
-		registroPassword(password);
+		inputPassword(password);
 	}else if(strlen(pass)<6){
-		printf("\n Password muito curta, tente outra vez\n");
+		printf("\n Password too short, please try again\n");
 		printf("\n Press any key to continue......");
 		getch();
-		registroPassword(password);
-	}else if(valor!=0){
-		printf("\n Passwords não coincidem!\n");
+		inputPassword(password);
+	}else if(cmpResult!=0){
+		printf("\n Passwords do not match!\n");
 		printf("\n Press any key to continue......");
 		getch();
-		registroPassword(password);
+		inputPassword(password);
 	}else
 		strcpy(password, pass);
 }
 
-//Registar Conta
-
-//Estatistica Friendster
-
-void mostrarEstatistica(){
+void showStatistics(){
 	system("CLS");
-	interface();
-	//Ultimo user logado (Gravar em base de dados)
+	showInterface();
+
 	FILE *lastlog;
 	lastlog = fopen("lastlog","rb");
 	if (lastlog == NULL){
@@ -1710,101 +1677,95 @@ void mostrarEstatistica(){
 		fclose(lastlog);
 		printf("\nTry Again ....");
 		getch();
-		mostrarEstatistica();
+		showStatistics();
 	}
-	struct user user;
+	struct User user;
 	while(fread(&user,sizeof(user),1,lastlog)){
-		printf("\n Ultima conta logada: %s %s - ID: %d",user.fName,user.lName,user.numeroConta);
+		printf("\n Last logged-in account: %s %s - ID: %d",user.firstName,user.lastName,user.accountId);
 	}
 	fclose(lastlog);
-	FILE *pubs;
-	pubs = fopen("pubs","rb");
-	if (pubs == NULL){
+	FILE *postsFile;
+	postsFile = fopen("posts","rb");
+	if (postsFile == NULL){
 		printf("1 ERROR: File not open");
-		fclose(pubs);
-		pubs = fopen("pubs","ab");
-		fclose(pubs);
+		fclose(postsFile);
+		postsFile = fopen("posts","ab");
+		fclose(postsFile);
 		printf("\nTry Again ....");
 		getch();
-		mostrarEstatistica();
+		showStatistics();
 	}
-	struct publicacao publicacao;
-	int maxUsers = verificarIdConta();
-	int i,totalPub=0,maxPub=0;
-	char lN[50],fN[50],maxF[50],maxL[50];
-	while(fread(&publicacao,sizeof(publicacao),1,pubs)){
-		for(i=1;i<maxUsers;i++){
-			if(i==publicacao.numeroConta){
-				totalPub ++;
-				strcpy(fN,publicacao.fname);
-				strcpy(lN,publicacao.lname);
+	struct Post post;
+	int totalUsers = nextAccountId();
+	int i,totalPostsCount=0,maxPostsByUser=0;
+	char lastN[50],firstN[50],maxFirst[50],maxLast[50];
+	while(fread(&post,sizeof(post),1,postsFile)){
+		for(i=1;i<totalUsers;i++){
+			if(i==post.accountId){
+				totalPostsCount ++;
+				strcpy(firstN,post.firstName);
+				strcpy(lastN,post.lastName);
 			}
 		}
-		if(totalPub>maxPub){
-			maxPub = totalPub;
-			strcpy(maxF,fN);
-			strcpy(maxL,lN);
+		if(totalPostsCount>maxPostsByUser){
+			maxPostsByUser = totalPostsCount;
+			strcpy(maxFirst,firstN);
+			strcpy(maxLast,lastN);
 		}
 	}
-	fclose(pubs);
-	FILE *log;
-	log = fopen("bd1","rb");
-	if (pubs == NULL){
+	fclose(postsFile);
+	FILE *usersFileR;
+	usersFileR = fopen("users","rb");
+	if (postsFile == NULL){
 		printf("1 ERROR: File not open");
-		fclose(log);
-		log = fopen("bd1","ab");
-		fclose(log);
+		fclose(usersFileR);
+		usersFileR = fopen("users","ab");
+		fclose(usersFileR);
 		printf("\nTry Again ....");
 		getch();
-		mostrarEstatistica();
+		showStatistics();
 	}
-	int maxAmg=0,maxUti=0;
-	while(fread(&user,sizeof(user),1,log)){
-		maxUti++;
-		if(user.amigos>maxAmg){
-			maxAmg = user.amigos;
-			strcpy(fN,user.fName);
-			strcpy(lN,user.lName);
+	int maxFriendsCount=0,totalUsersCount=0;
+	while(fread(&user,sizeof(user),1,usersFileR)){
+		totalUsersCount++;
+		if(user.friendsCount>maxFriendsCount){
+			maxFriendsCount = user.friendsCount;
+			strcpy(firstN,user.firstName);
+			strcpy(lastN,user.lastName);
 		}
 	}
-	fclose(log);
-	pubs = fopen("pubs","rb");
-	int maxPubs=0;
-	while(fread(&publicacao,sizeof(publicacao),1,pubs)){
-		maxPubs++;
+	fclose(usersFileR);
+	postsFile = fopen("posts","rb");
+	int totalPosts=0;
+	while(fread(&post,sizeof(post),1,postsFile)){
+		totalPosts++;
 	}
-	fclose(pubs);
-	//Utilizador com mais publicações
-	printf("\n %s %s tem %d publicações!",maxF,maxL,maxPub);
-	//Utilizador com mais amigos
-	printf("\n %s %s tem %d amigos!",fN,lN,maxAmg);
-	//Numero Total de Utilizadores	
-	printf("\n Existem %d utilizadores criados!",maxUti);
-	//Numero Total de Publicações
-	printf("\n Existem %d publicações criadas!",maxPubs);
-	int op;
-	printf("\n\n 1) Voltar");
-	printf("\n Opção: ");
-	scanf("%d",&op);
-	switch(op){
+	fclose(postsFile);
+
+	printf("\n %s %s has %d posts!",maxFirst,maxLast,maxPostsByUser);
+
+	printf("\n %s %s has %d friends!",firstN,lastN,maxFriendsCount);
+
+	printf("\n There are %d registered users!",totalUsersCount);
+
+	printf("\n There are %d posts created!",totalPosts);
+	int option;
+	printf("\n\n 1) Back");
+	printf("\n Option: ");
+	scanf("%d",&option);
+	switch(option){
 		case 1:
 			main();
 			break;
 		default:
-			printf("\n Opção invalida, tente novamente!");
+			printf("\n Invalid option, tente novamente!");
 			printf("\n Press any key to continue......");
 			getch();
-			mostrarEstatistica();
+			showStatistics();
 			break;
 	}
 }
 
-//Estatistica Friendster
-
-//Sair Programa
-
-int sairPrograma(){
+int exitProgram(){
 	exit(0);
 }
-
-//Sair Programa
