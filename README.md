@@ -4,17 +4,6 @@ University project (Algorithms and Data Structures I — University of Minho). F
 
 Note: This repository does not include prebuilt binaries nor the data files (`users`, `posts`, `friendships`, `lastlog`). Build locally to try the executable.
 
-## Summary
-- Features
-- Architecture & data
-- Requirements
-- Run
-- Build
-- Usage (flows)
-- Repo structure
-- Limitations & notes
-- Author & license
-
 ## Features
 - Account registration: first/last name, email, birth date, phone, username and masked password input.
 - Authentication (login) and session flow.
